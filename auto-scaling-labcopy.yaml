@@ -318,11 +318,11 @@ Resources:
             CGI
             systemctl enable --now httpd
 
-            # --- THIS IS THE CRUCIAL FIX ---
-            # We'll embed the shell variables directly into the document
+            # Use shell variables to get instance metadata
             INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
-            LOCAL_IP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
+            LOCAL_IP=$(curl -s http/169.254.169.254/latest/meta-data/local-ipv4)
 
+            # Embed the shell variables directly into the HTML using a heredoc
             cat > /var/www/html/index.html << EOF
             <!doctype html>
             <html>
@@ -334,7 +334,7 @@ Resources:
             </html>
             EOF
 
-            # Create stress script
+            # Create the stress script as a separate file
             cat > /var/www/cgi-bin/stress.sh <<'STRESS'
             #!/bin/bash
             echo "Content-type: text/plain"
