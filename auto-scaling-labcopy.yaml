@@ -301,6 +301,7 @@ Resources:
           Name: !Ref EC2InstanceProfile
         SecurityGroupIds:
           - !Ref InstanceSecurityGroup
+        # --- CORRECTED USER DATA ---
         UserData:
           Fn::Base64: !Sub |
             #!/bin/bash -xe
@@ -317,24 +318,21 @@ Resources:
             CGI
             systemctl enable --now httpd
 
+            # --- THIS IS THE CRUCIAL FIX ---
+            # We'll embed the shell variables directly into the document
             INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
             LOCAL_IP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
 
-            # Create index.html with placeholder text
-            cat > /var/www/html/index.html <<'INDEX'
+            cat > /var/www/html/index.html << EOF
             <!doctype html>
             <html>
             <body>
               <h1>Auto Scaling Demo</h1>
-              <p>Hello from <span id="ip">IP_ADDRESS</span> / <span id="iid">INSTANCE_ID_VALUE</span></p>
+              <p>Hello from ${LOCAL_IP} / ${INSTANCE_ID}</p>
               <button onclick="fetch('/cgi-bin/stress.sh')">Stress CPU (60s)</button>
             </body>
             </html>
-            INDEX
-
-            # Replace placeholders with actual values
-            sed -i "s|IP_ADDRESS|${LOCAL_IP}|g" /var/www/html/index.html
-            sed -i "s|INSTANCE_ID_VALUE|${INSTANCE_ID}|g" /var/www/html/index.html
+            EOF
 
             # Create stress script
             cat > /var/www/cgi-bin/stress.sh <<'STRESS'
