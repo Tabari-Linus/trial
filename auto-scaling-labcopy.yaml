@@ -352,7 +352,6 @@ Resources:
             chown -R apache:apache /var/www
             systemctl restart httpd
 
-
   AutoScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
