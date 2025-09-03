@@ -320,9 +320,10 @@ Resources:
 
             # Use shell variables to get instance metadata
             INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
-            LOCAL_IP=$(curl -s http/169.254.169.254/latest/meta-data/local-ipv4)
+            LOCAL_IP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
 
-            # Embed the shell variables directly into the HTML using a heredoc
+            # Use a shell here-document to write the HTML content with the
+            # shell variables, which will be substituted at runtime.
             cat > /var/www/html/index.html << EOF
             <!doctype html>
             <html>
